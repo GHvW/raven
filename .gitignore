@@ -1,0 +1,9 @@
+bin
+obj
+
+.suo
+.vs
+.vscode
+.idea
+.ionide
+.metals
