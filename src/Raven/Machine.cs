@@ -9,14 +9,18 @@ namespace Raven {
 
     public class Machine<TState, TTransition> {
 
-        private readonly IDictionary<TState, HashSet<ITransition<TTransition, TState>>> states;
+        private readonly IDictionary<TState, HashSet<Transition<TState, TTransition>>> states;
 
         public TState CurrentState { get; }
 
         public Machine(
             ISet<TState> states, 
-            ISet<ITransition<TTransition, TState>> transitions, 
+            ISet<Transition<TState, TTransition>> transitions, 
             TState initialState) {
+
+            if (!states.Contains(initialState)) {
+                throw new ArgumentException("the initial state must exist in the Set of states");
+            }
 
             this.CurrentState = initialState;
             this.states =
@@ -28,7 +32,7 @@ namespace Raven {
                             .ToHashSet());
         }
 
-        private Machine(IDictionary<TState, HashSet<ITransition<TTransition, TState>>> states, TState currentState) {
+        private Machine(IDictionary<TState, HashSet<Transition<TState, TTransition>>> states, TState currentState) {
             this.states = states;
             this.CurrentState = currentState;
         }

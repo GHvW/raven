@@ -12,15 +12,14 @@ namespace Raven.Test {
 
     public class GivenAMachineWithTwoStates {
 
-        record Data(int From, int To, string When) : ITransition<string, int>;
 
         private Machine<int, string> machine;
 
         public GivenAMachineWithTwoStates() {
             this.machine = new Machine<int, string>(
-                new HashSet<int>() { 1, 10 }, 
-                new HashSet<ITransition<string, int>>() { new Data(1, 2, "go") }, 
-                1);
+                states: new HashSet<int>() { 1, 10 }, 
+                transitions: new HashSet<Transition<int, string>>() { new Transition<int, string>(1, 2, "go") }, 
+                initialState: 1);
         }
 
         [Fact]
