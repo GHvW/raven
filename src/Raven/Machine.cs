@@ -1,50 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Raven {
 
-    public class Machine<TState, TTransition> {
+    public static class Machine {
 
-        private readonly IDictionary<TState, HashSet<Transition<TState, TTransition>>> states;
+        public static Func<TState, TTransition, TState> ToMachineFn<TState, TTransition>(this StateGraph<TState, TTransition> stateGraph)
+            where TState : notnull
+            where TTransition : notnull => (state, transition) => {
 
-        public TState CurrentState { get; }
+                if (stateGraph.States.TryGetValue(state, out var transitions)) {
+                    var it = transitions.FirstOrDefault(edge => edge.When.Equals(transition));
 
-        public Machine(
-            ISet<TState> states, 
-            ISet<Transition<TState, TTransition>> transitions, 
-            TState initialState) {
+                    //return it?.To ?? state; // why doesn't this work?
+                    return it != null
+                        ? it.To
+                        : state;
+                }
 
-            if (!states.Contains(initialState)) {
-                throw new ArgumentException("the initial state must exist in the Set of states");
-            }
-
-            this.CurrentState = initialState;
-            this.states =
-                states.ToDictionary(
-                    state => state,
-                    state => 
-                        transitions
-                            .Where(transition => transition.From.Equals(state))
-                            .ToHashSet());
-        }
-
-        private Machine(IDictionary<TState, HashSet<Transition<TState, TTransition>>> states, TState currentState) {
-            this.states = states;
-            this.CurrentState = currentState;
-        }
-
-        public Machine<TState, TTransition> Transition(TTransition item) {
-            var it = 
-                this.states[this.CurrentState]
-                    .FirstOrDefault(edge => edge.When.Equals(item));
-
-            return it != null
-                ? new Machine<TState, TTransition>(this.states, it.To)
-                : this;
-        }
+                return state;
+            };
     }
 }

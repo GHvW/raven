@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Raven {
 
-    public record Transition<TState, TTransition>(TState From, TState To, TTransition When);
-
+    public record Transition<TState, TTransition>(TState From, TState To, TTransition When) 
+        where TState : notnull
+        where TTransition : notnull;
 }
